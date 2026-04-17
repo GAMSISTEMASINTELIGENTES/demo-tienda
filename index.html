@@ -530,8 +530,48 @@ let allProducts = [];
 function filterCat(cat) {
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-  const filtered = cat ? allProducts.filter(p => p.category === cat) : allProducts;
-  renderProducts(filtered);
+  
+  if (cat === 'Fundas') {
+    renderFundasAgrupadas();
+  } else {
+    const filtered = cat ? allProducts.filter(p => p.category === cat) : allProducts;
+    renderProducts(filtered);
+  }
+}
+
+function renderFundasAgrupadas() {
+  const fundas = allProducts
+    .filter(p => p.category === 'Fundas')
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  
+  const grupos = {};
+  fundas.forEach(p => {
+    const grupo = p.model_group || 'Otros';
+    if (!grupos[grupo]) grupos[grupo] = [];
+    grupos[grupo].push(p);
+  });
+
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = Object.entries(grupos).map(([grupo, productos]) => `
+    <div style="grid-column:1/-1;padding:1rem 0 .5rem;border-bottom:1px solid var(--border);margin-top:1rem">
+      <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:700">${grupo}</span>
+    </div>
+    ${productos.map(p => `
+      <div class="product-card">
+        <div class="product-img">${p.emoji || '📦'}</div>
+        <div class="product-info">
+          <div class="product-cat">${p.category || ''}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-desc">${p.description || ''}</div>
+          <div class="product-footer">
+            <div class="product-price"><span class="currency">MXN </span>$${Number(p.price).toLocaleString()}</div>
+            <button class="add-btn" onclick="addToCart(${JSON.stringify(p).replace(/"/g,'&quot;')})" ${p.stock < 1 ? 'disabled title="Sin stock"' : ''}>
+              ${p.stock < 1 ? '✕' : '+'}
+            </button>
+          </div>
+        </div>
+      </div>`).join('')}
+  `).join('');
 }
 init();
 </script>
