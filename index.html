@@ -542,7 +542,7 @@ function filterCat(cat) {
 function renderFundasAgrupadas() {
   const fundas = allProducts
     .filter(p => p.category === 'Fundas')
-    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    .sort((a, b) => (b.sort_order || 0) - (a.sort_order || 0));
   
   const grupos = {};
   fundas.forEach(p => {
