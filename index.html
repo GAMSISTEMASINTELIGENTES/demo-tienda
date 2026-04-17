@@ -552,6 +552,47 @@ function renderFundasAgrupadas() {
   });
 
   const grid = document.getElementById('product-grid');
+  grid.innerHTML = Object.entries(grupos).map(([grupo, productos], i) => `
+    <div style="grid-column:1/-1">
+      <div onclick="toggleGrupo('grupo-${i}')" style="padding:.85rem 1rem;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+        <span style="font-family:var(--font-display);font-size:1rem;font-weight:700">${grupo}</span>
+        <span id="arrow-${i}" style="font-size:12px;color:var(--muted)">▶ Ver fundas</span>
+      </div>
+      <div id="grupo-${i}" style="display:none;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5px;margin-bottom:4px">
+        ${productos.map(p => `
+          <div class="product-card">
+            <div class="product-img">${p.emoji || '📦'}</div>
+            <div class="product-info">
+              <div class="product-cat">${p.category || ''}</div>
+              <div class="product-name">${p.name}</div>
+              <div class="product-desc">${p.description || ''}</div>
+              <div class="product-footer">
+                <div class="product-price"><span class="currency">MXN </span>$${Number(p.price).toLocaleString()}</div>
+                <button class="add-btn" onclick="addToCart(${JSON.stringify(p).replace(/"/g,'&quot;')})" ${p.stock < 1 ? 'disabled title="Sin stock"' : ''}>
+                  ${p.stock < 1 ? '✕' : '+'}
+                </button>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleGrupo(id) {
+  const el = document.getElementById(id);
+  const idx = id.split('-')[1];
+  const arrow = document.getElementById('arrow-' + idx);
+  if (el.style.display === 'none') {
+    el.style.display = 'grid';
+    arrow.textContent = '▼ Ocultar';
+  } else {
+    el.style.display = 'none';
+    arrow.textContent = '▶ Ver fundas';
+  }
+}
+
+  const grid = document.getElementById('product-grid');
   grid.innerHTML = Object.entries(grupos).map(([grupo, productos]) => `
     <div style="grid-column:1/-1;padding:1rem 0 .5rem;border-bottom:1px solid var(--border);margin-top:1rem">
       <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:700">${grupo}</span>
