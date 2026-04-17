@@ -155,6 +155,8 @@
     .nav-links { display: none; }
     .form-row { grid-template-columns: 1fr; }
   }
+.cat-btn { background: transparent; border: 1px solid var(--border); cursor: pointer; padding: 7px 16px; border-radius: 2px; font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; transition: all .2s; color: var(--muted); }
+.cat-btn:hover, .cat-btn.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
 </style>
 </head>
 <body>
@@ -186,14 +188,16 @@
 
 <section class="section" id="catalogo">
   <div class="section-header">
-    <h2 class="section-title">Catálogo</h2>
-  </div>
-  <div class="product-grid" id="product-grid">
-    <!-- skeletons mientras carga -->
-    <div style="height:300px" class="skeleton"></div>
-    <div style="height:300px" class="skeleton"></div>
-    <div style="height:300px" class="skeleton"></div>
-  </div>
+  <h2 class="section-title">Catálogo</h2>
+</div>
+<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem">
+  <button onclick="filterCat('')" class="cat-btn active" id="cat-all">Todos</button>
+  <button onclick="filterCat('Fundas')" class="cat-btn">Fundas</button>
+  <button onclick="filterCat('Cables')" class="cat-btn">Cables</button>
+  <button onclick="filterCat('Cargadores')" class="cat-btn">Cargadores</button>
+  <button onclick="filterCat('Audífonos')" class="cat-btn">Audífonos</button>
+  <button onclick="filterCat('Accesorios')" class="cat-btn">Accesorios</button>
+</div>
 </section>
 
 <section class="banner" id="nosotros">
@@ -311,7 +315,8 @@ async function loadProducts() {
     const res = await fetch(`${API_URL}/api/${STORE_ID}/products`);
     if (!res.ok) throw new Error('Error al cargar productos');
     const products = await res.json();
-    renderProducts(products);
+   allProducts = products;
+renderProducts(products);
   } catch (err) {
     document.getElementById('product-grid').innerHTML =
       `<p style="color:var(--muted);grid-column:1/-1">No se pudieron cargar los productos. Intenta más tarde.</p>`;
@@ -514,6 +519,14 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+let allProducts = [];
+
+function filterCat(cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const filtered = cat ? allProducts.filter(p => p.category === cat) : allProducts;
+  renderProducts(filtered);
+}
 init();
 </script>
 </body>
