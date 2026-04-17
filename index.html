@@ -272,7 +272,7 @@ let shippingCost = 120;
 
 // ─── INICIALIZAR ──────────────────────────────────────────────────────────────
 async function init() {
-  await Promise.all([loadStore(), loadProducts()]);
+await loadProducts();
   checkPaymentStatus();
 }
 
