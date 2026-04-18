@@ -488,7 +488,8 @@ async function uploadImage(productId, file) {
 }
 async function handleImageUpload() {
   const input = document.getElementById('img-upload');
-  if (!input.files.length || !editingProductId) return;
+ console.log('editingProductId:', editingProductId, 'files:', input.files.length);
+if (!input.files.length || !editingProductId) return;
   for (const file of input.files) {
     await uploadImage(editingProductId, file);
   }
