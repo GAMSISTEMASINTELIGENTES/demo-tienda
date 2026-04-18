@@ -247,6 +247,12 @@
       </div>
       <div class="fg"><label>Descripción</label><textarea id="p-desc" placeholder="Descripción del producto"></textarea></div>
     </div>
+   <div class="fg" style="margin-top:1rem">
+  <label>Imágenes del producto</label>
+  <div id="product-images" style="margin-bottom:.75rem;min-height:40px"></div>
+  <input type="file" id="img-upload" accept="image/*" multiple style="font-size:12px">
+  <button class="btn btn-sm" style="margin-top:.5rem" onclick="handleImageUpload()">Subir imágenes</button>
+</div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('product-modal')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveProduct()">Guardar producto</button>
@@ -445,9 +451,50 @@ function openProductModal(p = null) {
   document.getElementById('p-stock').value = p?.stock || '';
   document.getElementById('p-cat').value   = p?.category || '';
   document.getElementById('p-desc').value  = p?.description || '';
+  if (p) loadProductImages(p.id);
+  else { const c = document.getElementById('product-images'); if(c) c.innerHTML = ''; }
   document.getElementById('product-modal').classList.add('open');
 }
 
+async function loadProductImages(productId) {
+  try {
+    const res = await fetch(`${API_URL}/api/${STORE_ID}/products/${productId}/images`);
+    const images = await res.json();
+    const container = document.getElementById('product-images');
+    if (!container) return;
+    if (!images.length) { container.innerHTML = '<p style="color:var(--muted);font-size:12px">Sin imágenes aún</p>'; return; }
+    container.innerHTML = images.map(img => `
+      <div style="position:relative;display:inline-block;margin:4px">
+        <img src="${img.url}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+        <button onclick="deleteImage(${productId},'${img.name}')" style="position:absolute;top:-6px;right:-6px;background:var(--danger);color:white;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:10px;line-height:18px;text-align:center">✕</button>
+      </div>`).join('');
+  } catch {}
+}
+
+async function deleteImage(productId, filename) {
+  if (!confirm('¿Eliminar imagen?')) return;
+  await apiFetch(`/api/admin/${STORE_ID}/products/${productId}/images/${filename}`, { method: 'DELETE' });
+  loadProductImages(productId);
+}
+
+async function uploadImage(productId, file) {
+  const form = new FormData();
+  form.append('image', file);
+  await fetch(`${API_URL}/api/admin/${STORE_ID}/products/${productId}/images`, {
+    method: 'POST',
+    headers: { 'x-admin-key': ADMIN_KEY },
+    body: form
+  });
+  loadProductImages(productId);
+}
+async function handleImageUpload() {
+  const input = document.getElementById('img-upload');
+  if (!input.files.length || !editingProductId) return;
+  for (const file of input.files) {
+    await uploadImage(editingProductId, file);
+  }
+  input.value = '';
+}
 async function saveProduct() {
   const body = {
     name: document.getElementById('p-name').value.trim(),
