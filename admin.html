@@ -477,7 +477,7 @@ async function deleteImage(productId, filename) {
   loadProductImages(productId);
 }
 
-async function uploadImage(productId, file) {
+aasync function uploadImage(productId, file) {
   const form = new FormData();
   form.append('image', file);
   const res = await fetch(`${API_URL}/api/admin/${STORE_ID.toLowerCase()}/products/${productId}/images`, {
@@ -485,8 +485,9 @@ async function uploadImage(productId, file) {
     headers: { 'x-admin-key': ADMIN_KEY },
     body: form
   });
-  const data = await res.json();
-  console.log('upload response:', data);
+  console.log('status:', res.status);
+  const text = await res.text();
+  console.log('response:', text);
   loadProductImages(productId);
 }
 async function handleImageUpload() {
