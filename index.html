@@ -646,7 +646,7 @@ function toggleGrupo(id, idx) {
 async function loadGrupoImages(container, productos) {
   console.log('loadGrupoImages llamado con', productos?.length, 'productos');
   for (const p of productos) {
-    const card = container.querySelector(`[data-product-id="${p.id}"]`);
+    const card = document.querySelector(`[data-product-id="${p.id}"]`);
     console.log('buscando card para', p.id, ':', card ? 'encontrado' : 'NO encontrado');
     if (!card) continue;
     const imgDiv = card.querySelector('.product-img');
