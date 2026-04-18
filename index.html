@@ -647,17 +647,20 @@ async function loadGrupoImages(container, productos) {
   console.log('loadGrupoImages llamado con', productos?.length, 'productos');
   for (const p of productos) {
     const card = container.querySelector(`[data-product-id="${p.id}"]`);
+    console.log('buscando card para', p.id, ':', card ? 'encontrado' : 'NO encontrado');
     if (!card) continue;
     const imgDiv = card.querySelector('.product-img');
+    console.log('imgDiv:', imgDiv ? 'encontrado' : 'NO encontrado');
     if (!imgDiv || imgDiv.dataset.loaded) continue;
     try {
       const res = await fetch(`${API_URL}/api/${STORE_ID}/products/${p.id}/images`);
       const images = await res.json();
+      console.log('images para', p.id, ':', images.length);
       if (images.length) {
         imgDiv.innerHTML = `<img src="${images[0].url}" style="width:100%;height:100%;object-fit:cover">`;
       }
       imgDiv.dataset.loaded = true;
-    } catch {}
+    } catch(e) { console.log('error:', e); }
   }
 }
 init();
