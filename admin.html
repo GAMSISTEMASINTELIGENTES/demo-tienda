@@ -251,7 +251,7 @@
   <label>Imágenes del producto</label>
   <div id="product-images" style="margin-bottom:.75rem;min-height:40px"></div>
   <input type="file" id="img-upload" accept="image/*" multiple style="font-size:12px">
-<button class="btn btn-sm" style="margin-top:.5rem" onclick="console.log('id:', editingProductId); handleImageUpload()">Subir imágenes</button>
+<button class="btn btn-sm" id="btn-upload-img" style="margin-top:.5rem" onclick="handleImageUpload()">Subir imágenes</button>
 </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('product-modal')">Cancelar</button>
@@ -453,6 +453,8 @@ function openProductModal(p = null) {
   document.getElementById('p-desc').value  = p?.description || '';
   if (p) loadProductImages(p.id);
   else { const c = document.getElementById('product-images'); if(c) c.innerHTML = ''; }
+ const btnUpload = document.getElementById('btn-upload-img');
+if (btnUpload) btnUpload.setAttribute('data-product-id', p ? p.id : '');
   document.getElementById('product-modal').classList.add('open');
 }
 
@@ -487,11 +489,12 @@ async function uploadImage(productId, file) {
   loadProductImages(productId);
 }
 async function handleImageUpload() {
+  const pid = document.getElementById('btn-upload-img')?.getAttribute('data-product-id');
   const input = document.getElementById('img-upload');
- console.log('editingProductId:', editingProductId, 'files:', input.files.length);
-if (!input.files.length || !editingProductId) return;
+  console.log('pid:', pid, 'files:', input?.files?.length);
+  if (!input?.files?.length || !pid) return;
   for (const file of input.files) {
-    await uploadImage(editingProductId, file);
+    await uploadImage(pid, file);
   }
   input.value = '';
 }
