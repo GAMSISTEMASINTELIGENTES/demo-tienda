@@ -599,7 +599,9 @@ function renderFundasAgrupadas() {
   });
 
   const grid = document.getElementById('product-grid');
-  grid.innerHTML = Object.entries(grupos).map(([grupo, productos], i) => `
+const gruposEntries = Object.entries(grupos);
+gruposEntries.forEach(([grupo, productos], i) => { grupoProductos[i] = productos; });
+grid.innerHTML = gruposEntries.map(([grupo, productos], i) => `
   grupoProductos[i] = productos;
     <div style="grid-column:1/-1">
       <div onclick="toggleGrupo('grupo-${i}', ${i})" ${JSON.stringify(productos).replace(/"/g,'&quot;')})" style="padding:.85rem 1rem;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
