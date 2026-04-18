@@ -572,6 +572,7 @@ function showToast(msg) {
 }
 
 let allProducts = [];
+const grupoProductos = {};
 
 function filterCat(cat) {
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -599,8 +600,9 @@ function renderFundasAgrupadas() {
 
   const grid = document.getElementById('product-grid');
   grid.innerHTML = Object.entries(grupos).map(([grupo, productos], i) => `
+  grupoProductos[i] = productos;
     <div style="grid-column:1/-1">
-      <div onclick="toggleGrupo('grupo-${i}', ${JSON.stringify(productos).replace(/"/g,'&quot;')})" style="padding:.85rem 1rem;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <div onclick="toggleGrupo('grupo-${i}', ${i})" ${JSON.stringify(productos).replace(/"/g,'&quot;')})" style="padding:.85rem 1rem;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
         <span style="font-family:var(--font-display);font-size:1rem;font-weight:700">${grupo}</span>
         <span id="arrow-${i}" style="font-size:12px;color:var(--muted)">▶ Ver fundas</span>
       </div>
@@ -625,10 +627,10 @@ function renderFundasAgrupadas() {
   `).join('');
 }
 
-function toggleGrupo(id, productos) {
+function toggleGrupo(id, idx) {
+  const productos = grupoProductos[idx];
   const el = document.getElementById(id);
-  const idx = id.split('-')[1];
-  const arrow = document.getElementById('arrow-' + idx);
+    const arrow = document.getElementById('arrow-' + idx);
   if (el.style.display === 'none') {
     el.style.display = 'grid';
     arrow.textContent = '▼ Ocultar';
