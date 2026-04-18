@@ -488,14 +488,14 @@ async function uploadImage(productId, file) {
   loadProductImages(productId);
 }
 async function handleImageUpload() {
-  const pid = document.getElementById('btn-upload-img')?.getAttribute('data-product-id');
   const input = document.getElementById('img-upload');
-  console.log('pid:', pid, 'files:', input?.files?.length);
-  if (!input?.files?.length || !pid) return;
+  console.log('editingProductId:', editingProductId, 'files:', input?.files?.length);
+  if (!input?.files?.length || !editingProductId) return;
   for (const file of input.files) {
-    await uploadImage(pid, file);
+    await uploadImage(editingProductId, file);
   }
   input.value = '';
+  loadProductImages(editingProductId);
 }
 async function saveProduct() {
   const body = {
