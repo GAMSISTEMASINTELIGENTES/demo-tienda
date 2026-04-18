@@ -477,7 +477,7 @@ async function deleteImage(productId, filename) {
   loadProductImages(productId);
 }
 
-aasync function uploadImage(productId, file) {
+async function uploadImage(productId, file) {
   const form = new FormData();
   form.append('image', file);
   const res = await fetch(`${API_URL}/api/admin/${STORE_ID.toLowerCase()}/products/${productId}/images`, {
