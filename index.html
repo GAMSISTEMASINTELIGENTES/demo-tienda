@@ -268,6 +268,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<!-- MODAL GALERÍA -->
+<div class="modal-overlay" id="gallery-modal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title" id="gallery-title">Producto</span>
+      <button class="close-btn" onclick="closeGallery()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="gallery-images" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:120px"></div>
+      <div style="margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center">
+        <div id="gallery-price" style="font-family:var(--font-display);font-size:1.4rem"></div>
+        <button class="btn-primary" id="gallery-add-btn">Agregar al carrito</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
@@ -518,6 +534,36 @@ function checkPaymentStatus() {
 }
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
+async function openGallery(p) {
+  document.getElementById('gallery-title').textContent = p.name;
+  document.getElementById('gallery-price').textContent = `MXN $${Number(p.price).toLocaleString()}`;
+  document.getElementById('gallery-modal').classList.add('open');
+  
+  const btn = document.getElementById('gallery-add-btn');
+  btn.onclick = () => { addToCart(p); closeGallery(); };
+  
+  const container = document.getElementById('gallery-images');
+  container.innerHTML = '<p style="color:var(--muted);font-size:13px">Cargando imágenes...</p>';
+  
+  try {
+    const res = await fetch(`${API_URL}/api/${STORE_ID}/products/${p.id}/images`);
+    const images = await res.json();
+    if (!images.length) {
+      container.innerHTML = `<div style="font-size:4rem;width:100%;text-align:center">${p.emoji || '📦'}</div>`;
+    } else {
+      container.innerHTML = images.map(img => `
+        <img src="${img.url}" style="width:180px;height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" 
+             onclick="this.style.outline='3px solid var(--accent)';document.querySelectorAll('#gallery-images img').forEach(i=>i.style.outline='');this.style.outline='3px solid var(--accent)'">
+      `).join('');
+    }
+  } catch {
+    container.innerHTML = `<div style="font-size:4rem;width:100%;text-align:center">${p.emoji || '📦'}</div>`;
+  }
+}
+
+function closeGallery() {
+  document.getElementById('gallery-modal').classList.remove('open');
+}
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -560,7 +606,7 @@ function renderFundasAgrupadas() {
       </div>
       <div id="grupo-${i}" style="display:none;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5px;margin-bottom:4px">
         ${productos.map(p => `
-          <div class="product-card">
+       <div class="product-card" onclick="openGallery(${JSON.stringify(p).replace(/"/g,'&quot;')})">
             <div class="product-img">${p.emoji || '📦'}</div>
             <div class="product-info">
               <div class="product-cat">${p.category || ''}</div>
