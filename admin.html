@@ -458,8 +458,7 @@ function openProductModal(p = null) {
 
 async function loadProductImages(productId) {
   try {
-    const res = await fetch(`${API_URL}/api/${STORE_ID}/products/${productId}/images`);
-    const images = await res.json();
+const res = await fetch(`${API_URL}/api/${STORE_ID.toLowerCase()}/products/${productId}/images`);    const images = await res.json();
     const container = document.getElementById('product-images');
     if (!container) return;
     if (!images.length) { container.innerHTML = '<p style="color:var(--muted);font-size:12px">Sin imágenes aún</p>'; return; }
@@ -480,7 +479,7 @@ async function deleteImage(productId, filename) {
 async function uploadImage(productId, file) {
   const form = new FormData();
   form.append('image', file);
-  await fetch(`${API_URL}/api/admin/${STORE_ID}/products/${productId}/images`, {
+ await fetch(`${API_URL}/api/admin/${STORE_ID.toLowerCase()}/products/${productId}/images`
     method: 'POST',
     headers: { 'x-admin-key': ADMIN_KEY },
     body: form
