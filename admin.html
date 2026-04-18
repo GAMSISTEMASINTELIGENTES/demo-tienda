@@ -480,11 +480,13 @@ async function deleteImage(productId, filename) {
 async function uploadImage(productId, file) {
   const form = new FormData();
   form.append('image', file);
- await fetch(`${API_URL}/api/admin/${STORE_ID.toLowerCase()}/products/${productId}/images`, {
+  const res = await fetch(`${API_URL}/api/admin/${STORE_ID.toLowerCase()}/products/${productId}/images`, {
     method: 'POST',
     headers: { 'x-admin-key': ADMIN_KEY },
     body: form
   });
+  const data = await res.json();
+  console.log('upload response:', data);
   loadProductImages(productId);
 }
 async function handleImageUpload() {
