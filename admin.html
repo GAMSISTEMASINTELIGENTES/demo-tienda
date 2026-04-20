@@ -244,6 +244,7 @@
         <div class="fg"><label>Precio (MXN) *</label><input id="p-price" type="number" placeholder="0"></div>
         <div class="fg"><label>Stock *</label><input id="p-stock" type="number" placeholder="0"></div>
         <div class="fg"><label>Categoría</label><input id="p-cat" placeholder="Ropa, Joyería..."></div>
+        <div class="fg"><label>Grupo de modelo (solo fundas)</label><input id="p-model-group" placeholder="iPhone 17 Pro Max"></div>
       </div>
       <div class="fg"><label>Descripción</label><textarea id="p-desc" placeholder="Descripción del producto"></textarea></div>
     </div>
@@ -449,6 +450,7 @@ function openProductModal(p = null) {
   document.getElementById('p-price').value = p?.price || '';
   document.getElementById('p-stock').value = p?.stock || '';
   document.getElementById('p-cat').value   = p?.category || '';
+  document.getElementById('p-model-group').value = p?.model_group || '';
   document.getElementById('p-desc').value  = p?.description || '';
   if (p) loadProductImages(p.id);
   else { const c = document.getElementById('product-images'); if(c) c.innerHTML = ''; }
@@ -507,7 +509,8 @@ async function saveProduct() {
     price: Number(document.getElementById('p-price').value),
     stock: Number(document.getElementById('p-stock').value),
     category: document.getElementById('p-cat').value.trim(),
-    description: document.getElementById('p-desc').value.trim()
+    description: document.getElementById('p-desc').value.trim(),
+    model_group: document.getElementById('p-model-group').value.trim()
   };
   if (!body.name || !body.price) { alert('Nombre y precio son requeridos'); return; }
   try {
