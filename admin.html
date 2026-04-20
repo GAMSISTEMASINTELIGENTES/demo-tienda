@@ -185,10 +185,12 @@
     <!-- PRODUCTOS -->
     <div id="page-productos" class="page">
       <div class="card">
-        <div class="card-head">
-          <span class="card-title">Mis productos</span>
-          <button class="btn btn-primary" onclick="openProductModal()">+ Agregar producto</button>
-        </div>
+  <div class="card-head">
+    <span class="card-title">Mis productos</span>
+    <div style="display:flex;gap:.75rem;align-items:center">
+      <input type="text" id="product-search" placeholder="Buscar producto..." style="border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-family:var(--font);font-size:13px;background:var(--bg);color:var(--ink)" oninput="filterProducts(this.value)">
+      <button class="btn btn-primary" onclick="openProductModal()">+ Agregar producto</button>
+    </div>
         <div id="products-table"><div class="loading">Cargando productos...</div></div>
       </div>
     </div>
@@ -418,28 +420,43 @@ async function saveOrderStatus() {
 }
 
 // ─── PRODUCTOS ────────────────────────────────────────────────────────────────
+let allAdminProducts = [];
+
+function filterProducts(q) {
+  const filtered = q
+    ? allAdminProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || (p.category || '').toLowerCase().includes(q.toLowerCase()))
+    : allAdminProducts;
+  renderProductsTable(filtered);
+}
 async function loadProducts() {
   try {
     const products = await apiFetch(`/api/admin/${STORE_ID}/products`);
+    allAdminProducts = products || [];
     const el = document.getElementById('products-table');
-    if (!products?.length) { el.innerHTML = '<div class="empty-state">Sin productos aún. ¡Agrega el primero!</div>'; return; }
-    el.innerHTML = `<table>
-      <thead><tr><th></th><th>Producto</th><th>Precio</th><th>Stock</th><th>Categoría</th><th>Estado</th><th></th></tr></thead>
-      <tbody>${products.map(p => `
-        <tr>
-          <td><div class="product-emoji">${p.emoji || '📦'}</div></td>
-          <td><div style="font-weight:600">${p.name}</div><div style="color:var(--muted);font-size:12px">${p.description || ''}</div></td>
-          <td style="font-weight:600">$${Number(p.price).toLocaleString()}</td>
-          <td class="${p.stock === 0 ? 'stock-out' : p.stock <= 5 ? 'stock-low' : ''}">${p.stock}</td>
-          <td style="color:var(--muted)">${p.category || '—'}</td>
-          <td><span class="badge ${p.active ? 'badge-active' : 'badge-out'}">${p.active ? 'Activo' : 'Inactivo'}</span></td>
-          <td style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="openProductModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Editar</button>
-            <button class="btn btn-sm btn-danger" onclick="toggleProduct(${p.id},${p.active})">${p.active ? 'Desactivar' : 'Activar'}</button>
-          </td>
-        </tr>`).join('')}
-      </tbody></table>`;
+    allAdminProducts = products || [];
+    renderProductsTable(products);
   } catch {}
+}
+
+function renderProductsTable(products) {
+  const el = document.getElementById('products-table');
+  if (!products?.length) { el.innerHTML = '<div class="empty-state">Sin productos aún. ¡Agrega el primero!</div>'; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th></th><th>Producto</th><th>Precio</th><th>Stock</th><th>Categoría</th><th>Estado</th><th></th></tr></thead>
+    <tbody>${products.map(p => `
+      <tr>
+        <td><div class="product-emoji">${p.emoji || '📦'}</div></td>
+        <td><div style="font-weight:600">${p.name}</div><div style="color:var(--muted);font-size:12px">${p.description || ''}</div></td>
+        <td style="font-weight:600">$${Number(p.price).toLocaleString()}</td>
+        <td class="${p.stock === 0 ? 'stock-out' : p.stock <= 5 ? 'stock-low' : ''}">${p.stock}</td>
+        <td style="color:var(--muted)">${p.category || '—'}</td>
+        <td><span class="badge ${p.active ? 'badge-active' : 'badge-out'}">${p.active ? 'Activo' : 'Inactivo'}</span></td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="openProductModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="toggleProduct(${p.id},${p.active})">${p.active ? 'Desactivar' : 'Activar'}</button>
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
 }
 
 function openProductModal(p = null) {
